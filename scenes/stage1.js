@@ -4,8 +4,6 @@ class Stage1 extends Phaser.Scene {
   }
 
   preload() {
-    // this.load.spritesheet('alien','assets/player1.png',{frameWidth:100,frameHeight:100});
-    // this.load.image('background', 'assets/background.png');
     this.load.image('trader','assets/ValescanTrader.png');
     this.load.image('farmhouse','assets/FarmHouse.png');
     this.load.image('farm','assets/farm.png');
@@ -172,6 +170,8 @@ class Stage1 extends Phaser.Scene {
     let carpenter = new Worksite("carpenter",6,this.physics.add.sprite(100,425,'carbon'),this.physics.add.sprite(165,410,'addButton'),this.physics.add.sprite(625,365,'lumberUI'),this.physics.add.sprite(975,185,'xbutton'),this.add.text(660,280,"0",{fontFamily: '"Roboto Condensed"'}),[309,340],1/2,[1,"carpentry"],true);
     let smith = new Worksite("smith",7,this.physics.add.sprite(935,440,'carbon'),this.physics.add.sprite(985,430,'addButton'),this.physics.add.sprite(450,345,'lumberUI'),this.physics.add.sprite(800,165,'xbutton'),this.add.text(500,258,"0",{fontFamily: `"Roboto Condensed"`}),[134,320],1/2,[1,"smithing"],true);
     let monk = new Worksite("monk",8,this.physics.add.sprite(843,65,"carbon"),this.physics.add.sprite(876,53,"addButton"),this.physics.add.sprite(1112,375,'lumberUI'),this.physics.add.sprite(1425,190,'xbutton'),this.add.text(1154,287,"0",{fontFamily: '"Roboto Condensed"'}),[795,350],1/3,[2,"magic"],true);
+    let tree = new Worksite("tree",9,this.physics.add.sprite(1320,175,"carbon"),this.physics.add.sprite(1353,163,"addButton"),this.physics.add.sprite(1112,475,'lumberUI'),this.physics.add.sprite(1425,290,'xbutton'),this.add.text(1154,387,"0",{fontFamily: '"Roboto Condensed"'}),[795,450],1/3,[4,"magic"],true);
+    let church = new Worksite("church",10,this.physics.add.sprite(550,650,"carbon"),this.physics.add.sprite(585,637,"addButton"),this.physics.add.sprite(1112,475,'lumberUI'),this.physics.add.sprite(1425,290,'xbutton'),this.add.text(1154,387,"0",{fontFamily: '"Roboto Condensed"'}),[795,450],1/3,[1,"faith"],true);
     farm.init()
     mine.init()
     trader.init()
@@ -180,10 +180,13 @@ class Stage1 extends Phaser.Scene {
     carpenter.init()
     smith.init()
     monk.init()
+    tree.init()
+    church.init()
     trader.workSprite.setScale(1.5)
     carpenter.workSprite.setScale(0.75)
     smith.workSprite.setScale(0.5)
     monk.workSprite.setScale(0.25)
+    church.workSprite.setScale(0.75)
     let notEnoughFoodUI = this.add.image(this.worldView.centerX,this.worldView.centerY,'notEnoughFoodUI').setScrollFactor(0)
     notEnoughFoodUI.visible = false;
     //\/\//\/\//\///\\/\/\/\/\/\\\/\/\/\/\/\/\/\\\/\\/\\/\/\//\/\//\\/\//\\/\
@@ -235,6 +238,10 @@ class Stage1 extends Phaser.Scene {
           this.working = 7
         } else if (uiState == "monk") {
           this.working = 8
+        } else if (uiState == "tree") {
+          this.working = 9
+        } else if (uiState == "church") {
+          this.working = 10
         }
         gameManager.calculateMultipliers()
         gameManager.setResourceUI();
@@ -418,8 +425,8 @@ class Stage1 extends Phaser.Scene {
     let lucindaParge = new Townmember("Lucinda Parge", 32, "I am happy",[],["farm"],[189,0],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"lucindaPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[189,0])
     let cebanVepren = new Townmember("Ceban Vepren", 26, "I am happy",[],["trader"],[0,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"cebanPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[252,0])
     let kainaVepren = new Townmember("Kaina Vepren", 22, "I am happy",[],[],[63,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"kainaPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[0,74])
-    let jarackRhysling = new Townmember("Jarack Rhysling", 74, "I am happy",[],["prayer","monk","lumber","mine"],[126,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"jarackPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[63,74])
-    let verdaanisPadra = new Townmember("Verdaanis Padra", 52, "I am happy",[],["prayer","monk"],[189,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"verdaanisPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[126,74])
+    let jarackRhysling = new Townmember("Jarack Rhysling", 74, "I am happy",[],["church","monk","tree","lumber","mine"],[126,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"jarackPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[63,74])
+    let verdaanisPadra = new Townmember("Verdaanis Padra", 52, "I am happy",[],["church","monk","tree"],[189,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"verdaanisPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[126,74])
     let alvorRiverwood = new Townmember("Alvor Riverwood", 39, "I am happy",[],["smith","smith","smith"],[0,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"alvorPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[189,74])
     let marstonSinch = new Townmember("Marston Sinch", 45, "I am happy",[],["lumber","mine"],[63,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"marstonPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[252,74])
     let corlissSinch = new Townmember("Corliss Sinch", 43, "I am happy",[],[],[126,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"corlissPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[0,148])
@@ -428,8 +435,8 @@ class Stage1 extends Phaser.Scene {
     let saedeVepren = new Townmember("Saede Vepren", 10, "I am happy",[],[],[313,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"saedePopup"),true,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[189,148])
     let kesliSinch = new Townmember("Kesli Sinch", 13, "I am happy",[],[],[377,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"kesliPopup"),true,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[252,148])
     let rydenCorbray = new Townmember("Ryden Corbray", 11, "I am happy",[],[],[252,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"rydenPopup"),true,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[0,222])
-    let jeylaCovan = new Townmember("Jeyla Covan", 84, "I am happy",[],["prayer"],[313,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"jeylaPopup"),true,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[63,222])
-    let melinaPyle = new Townmember("Melina Pyle", 68, "I am happy",[],["prayer"],[377,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"melinaPopup"),true,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[126,222])
+    let jeylaCovan = new Townmember("Jeyla Covan", 84, "I am happy",[],["church"],[313,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"jeylaPopup"),true,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[63,222])
+    let melinaPyle = new Townmember("Melina Pyle", 68, "I am happy",[],["church"],[377,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"melinaPopup"),true,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[126,222])
     reilaCatell.init()
     daltisNaalor.init()
     larrisParge.init()
@@ -575,6 +582,8 @@ class Stage1 extends Phaser.Scene {
               carpenter: carpenter.worksiteOracle,
               smith: smith.worksiteOracle,
               monk: monk.worksiteOracle,
+              tree: tree.worksiteOracle,
+              church: church.worksiteOracle,
             },
             foodScreen: notEnoughFoodUI,
             foodCredit: foodCreditUI,
@@ -795,8 +804,8 @@ class Stage1 extends Phaser.Scene {
         this.town.resources.ui.oracle.carpenter.setText((gameManager.worksites[5].output[0] * gameManager.worksites[5].multiplier) + " Carpentry")
         this.town.resources.ui.oracle.smith.setText((gameManager.worksites[6].output[0] * gameManager.worksites[6].multiplier) + " Smithing")
         this.town.resources.ui.oracle.monk.setText((gameManager.worksites[7].output[0] * gameManager.worksites[7].multiplier) + " Magic")
-
-
+        this.town.resources.ui.oracle.tree.setText((gameManager.worksites[8].output[0] * gameManager.worksites[8].multiplier) + " Magic")
+        this.town.resources.ui.oracle.church.setText((gameManager.worksites[9].output[0] * gameManager.worksites[9].multiplier) + " Faith")
       }
     }
 

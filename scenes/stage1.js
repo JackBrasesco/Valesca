@@ -58,6 +58,7 @@ class Stage1 extends Phaser.Scene {
     this.load.image('lumberUI',"assets/UILumber.png");
     this.load.image('lumber','assets/lumber.png')
     this.load.image('finalizeButton',"assets/finalize.png");
+    this.load.image('buildButton','assets/BuildButton.png');
   }
 
   create() {
@@ -93,7 +94,7 @@ class Stage1 extends Phaser.Scene {
     // CREATION AND INITIALIZATION OF WORKSITE CLASS                       /\
     //\/\//\/\//\///\\/\/\/\/\/\\\/\/\/\/\/\/\/\\\/\\/\\/\/\//\/\//\\/\//\\/\
     class Worksite {
-      constructor(name,id,workSprite,worksiteButton,worksiteUI,worksiteX,worksiteOracle,townmemberOffset,tireAmount,output,built) {
+      constructor(name,id,workSprite,worksiteButton,worksiteUI,worksiteX,worksiteOracle,townmemberOffset,tireAmount,output,built,buildButton,cost) {
         this.name = name;
         this.id = id;
         this.workSprite = workSprite;
@@ -106,6 +107,8 @@ class Stage1 extends Phaser.Scene {
         this.output = output
         this.multiplier = 0
         this.built = built;
+        this.buildButton = buildButton;
+        this.cost = cost;
       }
       init() {
         this.worksiteUI.body.setAllowGravity(false);
@@ -117,11 +120,77 @@ class Stage1 extends Phaser.Scene {
         this.worksiteButton.setInteractive();
         this.worksiteButton.setScale(1.5);
         this.worksiteButton.body.setAllowGravity(false);
+        if (!this.built) {
+          this.worksiteButton.visible = false;
+          this.buildButton.setInteractive();
+          this.buildButton.body.setAllowGravity(false);
+        } else {
+          this.buildButton.visible = false;
+        }
         this.workSprite.body.setAllowGravity(false);
         this.worksiteButton.on('pointerdown',pointer => {this.resolveButton(pointer)});
         this.worksiteX.on('pointerdown', pointer => {this.resolveX(pointer)});
+        this.buildButton.on('pointerdown', pointer => {this.checkCost(pointer)});
         worksites.push(this);
         console.log(this.output)
+      }
+      build() {
+        this.worksiteButton.visible = true;
+        this.buildButton.visible = false;
+      }
+      checkCost() {
+        let errArr = []
+        let refunds = []
+        for (let i=0;i<this.cost.length;i+=2) {
+          if (this.cost[i+1] == "stone") {
+            if (gameManager.town.resources.stone >= this.cost[i]) {
+              console.log("you have enough stone to purchase this!")
+              gameManager.town.resources.stone -= this.cost[i]
+              gameManager.setResourceUI();
+              refunds.push(this.cost[i])
+              refunds.push(this.cost[i+1])
+            } else {
+              errArr.push(1);
+            }
+          } else if (this.cost[i+1] == "wood") {
+            if (gameManager.town.resources.wood >= this.cost[i]) {
+              console.log("you have enough wood to purchase this!")
+              gameManager.town.resources.wood -= this.cost[i]
+              gameManager.setResourceUI();
+              refunds.push(this.cost[i])
+              refunds.push(this.cost[i+1])
+            } else {
+              errArr.push(1);
+            }
+          } else if (this.cost[i+1] == "metal") {
+            if (gameManager.town.resources.metal >= this.cost[i]) {
+              console.log("you have enough metal to purchase this!")
+              gameManager.town.resources.metal -= this.cost[i]
+              gameManager.setResourceUI();
+              refunds.push(this.cost[i])
+              refunds.push(this.cost[i+1])
+            } else {
+              errArr.push(1);
+            }
+          }
+        }
+        if (errArr.length == 0) {
+          this.build()
+        } else {
+          console.log("You do not have the required resources to build this worksite")
+          for (let i=0;i<refunds.length;i+=2 ){
+            if (refunds[i+1] == "stone") {
+              gameManager.town.resources.stone += refunds[i]
+              gameManager.setResourceUI()
+            } else if (refunds[i+1] == "wood") {
+              gameManager.town.resources.wood += refunds[i]
+              gameManager.setResourceUI()
+            } else if (refunds[i+1] == "metal") {
+              gameManager.town.resources.wood += refunds[i]
+              gameManager.setResourceUI()
+            }
+          }
+        }
       }
       resolveX() {
         uiState = 'none'
@@ -162,16 +231,16 @@ class Stage1 extends Phaser.Scene {
       }
     }
 
-    let farm = new Worksite("farm",1,this.physics.add.sprite(1255,685,'farmhouse'),this.physics.add.sprite(1290,675,'addButton'),this.physics.add.sprite(750,675,'farmUI'), this.physics.add.sprite(1100,500,'xbutton'),this.add.text(790,585,"0",{ fontFamily: '"Roboto Condensed"'}),[434,650],1/2,[5,"food"],true);
-    let mine = new Worksite("mine",2,this.physics.add.sprite(1454,355,'mine'),this.physics.add.sprite(1495,367,'addButton'),this.physics.add.sprite(900,355,'mineUI'),this.physics.add.sprite(1250,185,'xbutton'),this.add.text(930,265,"0" ,{ fontFamily: '"Roboto Condensed"'}),[584,340],1,[],true);
-    let trader = new Worksite("trader",3,this.physics.add.sprite(255,300,'trader'),this.physics.add.sprite(310,290,'addButton'),this.physics.add.sprite(800,300,'traderUI'),this.physics.add.sprite(1150,130,'xbutton'),this.add.text(835,215,"0" ,{ fontFamily: '"Roboto Condensed"'}),[484,275],1/3,[25,"money"],true);
-    let hunter = new Worksite("hunter",4,this.physics.add.sprite(200,75,'hunterhouse'),this.physics.add.sprite(240,65,'addButton'),this.physics.add.sprite(700,300,'hunterUI'),this.physics.add.sprite(1050,120,'xbutton'),this.add.text(735,215,"0" ,{ fontFamily: '"Roboto Condensed"'}),[384,275],1/2,[3,"food"],true);
-    let lumber = new Worksite("lumber",5,this.physics.add.sprite(400,85,'lumber'),this.physics.add.sprite(440,75,'addButton'),this.physics.add.sprite(800,300,'lumberUI'),this.physics.add.sprite(1150,120,'xbutton'),this.add.text(835,215,"0" ,{ fontFamily: '"Roboto Condensed"'}),[484,275],1/2,[20,"wood"],true);
-    let carpenter = new Worksite("carpenter",6,this.physics.add.sprite(100,425,'carbon'),this.physics.add.sprite(165,410,'addButton'),this.physics.add.sprite(625,365,'lumberUI'),this.physics.add.sprite(975,185,'xbutton'),this.add.text(660,280,"0",{fontFamily: '"Roboto Condensed"'}),[309,340],1/2,[1,"carpentry"],true);
-    let smith = new Worksite("smith",7,this.physics.add.sprite(935,440,'carbon'),this.physics.add.sprite(985,430,'addButton'),this.physics.add.sprite(450,345,'lumberUI'),this.physics.add.sprite(800,165,'xbutton'),this.add.text(500,258,"0",{fontFamily: `"Roboto Condensed"`}),[134,320],1/2,[1,"smithing"],true);
-    let monk = new Worksite("monk",8,this.physics.add.sprite(843,65,"carbon"),this.physics.add.sprite(876,53,"addButton"),this.physics.add.sprite(1112,375,'lumberUI'),this.physics.add.sprite(1425,190,'xbutton'),this.add.text(1154,287,"0",{fontFamily: '"Roboto Condensed"'}),[795,350],1/3,[2,"magic"],true);
-    let tree = new Worksite("tree",9,this.physics.add.sprite(1320,175,"carbon"),this.physics.add.sprite(1353,163,"addButton"),this.physics.add.sprite(1112,475,'lumberUI'),this.physics.add.sprite(1425,290,'xbutton'),this.add.text(1154,387,"0",{fontFamily: '"Roboto Condensed"'}),[795,450],1/3,[4,"magic"],true);
-    let church = new Worksite("church",10,this.physics.add.sprite(550,650,"carbon"),this.physics.add.sprite(585,637,"addButton"),this.physics.add.sprite(1112,475,'lumberUI'),this.physics.add.sprite(1425,290,'xbutton'),this.add.text(1154,387,"0",{fontFamily: '"Roboto Condensed"'}),[795,450],1/3,[1,"faith"],true);
+    let farm = new Worksite("farm",1,this.physics.add.sprite(1255,685,'farmhouse'),this.physics.add.sprite(1290,675,'addButton'),this.physics.add.sprite(750,675,'farmUI'), this.physics.add.sprite(1100,500,'xbutton'),this.add.text(790,585,"0",{ fontFamily: '"Roboto Condensed"'}),[434,650],1/2,[5,"food"],false,this.physics.add.sprite(1255,685,'buildButton'),[150,"stone",40,"wood"]);
+    let mine = new Worksite("mine",2,this.physics.add.sprite(1454,355,'mine'),this.physics.add.sprite(1495,367,'addButton'),this.physics.add.sprite(900,355,'mineUI'),this.physics.add.sprite(1250,185,'xbutton'),this.add.text(930,265,"0" ,{ fontFamily: '"Roboto Condensed"'}),[584,340],1,[],false,this.physics.add.sprite(1454,355,'buildButton'),[20,"wood",5,"metal"]);
+    let trader = new Worksite("trader",3,this.physics.add.sprite(255,300,'trader'),this.physics.add.sprite(310,290,'addButton'),this.physics.add.sprite(800,300,'traderUI'),this.physics.add.sprite(1150,130,'xbutton'),this.add.text(835,215,"0" ,{ fontFamily: '"Roboto Condensed"'}),[484,275],1/3,[25,"money"],false,this.physics.add.sprite(255,300,'buildButton'),[200,"wood",40,"stone"]);
+    let hunter = new Worksite("hunter",4,this.physics.add.sprite(200,75,'hunterhouse'),this.physics.add.sprite(240,65,'addButton'),this.physics.add.sprite(700,300,'hunterUI'),this.physics.add.sprite(1050,120,'xbutton'),this.add.text(735,215,"0" ,{ fontFamily: '"Roboto Condensed"'}),[384,275],1/2,[3,"food"],true,this.physics.add.sprite(200,75,'buildButton'),["null"]);
+    let lumber = new Worksite("lumber",5,this.physics.add.sprite(400,85,'lumber'),this.physics.add.sprite(440,75,'addButton'),this.physics.add.sprite(800,300,'lumberUI'),this.physics.add.sprite(1150,120,'xbutton'),this.add.text(835,215,"0" ,{ fontFamily: '"Roboto Condensed"'}),[484,275],1/2,[20,"wood"],true,this.physics.add.sprite(400,85,'buildButton'),["null"]);
+    let carpenter = new Worksite("carpenter",6,this.physics.add.sprite(100,425,'carbon'),this.physics.add.sprite(165,410,'addButton'),this.physics.add.sprite(625,365,'lumberUI'),this.physics.add.sprite(975,185,'xbutton'),this.add.text(660,280,"0",{fontFamily: '"Roboto Condensed"'}),[309,340],1/2,[1,"carpentry"],false,this.physics.add.sprite(100,435,'buildButton'),[240,"wood"]);
+    let smith = new Worksite("smith",7,this.physics.add.sprite(935,440,'carbon'),this.physics.add.sprite(985,430,'addButton'),this.physics.add.sprite(450,345,'lumberUI'),this.physics.add.sprite(800,165,'xbutton'),this.add.text(500,258,"0",{fontFamily: `"Roboto Condensed"`}),[134,320],1/2,[1,"smithing"],false,this.physics.add.sprite(935,440,'buildButton'),[140,"wood",75,"stone",10,"metal"]);
+    let monk = new Worksite("monk",8,this.physics.add.sprite(843,65,"carbon"),this.physics.add.sprite(876,53,"addButton"),this.physics.add.sprite(1112,375,'lumberUI'),this.physics.add.sprite(1425,190,'xbutton'),this.add.text(1154,287,"0",{fontFamily: '"Roboto Condensed"'}),[795,350],1/3,[2,"magic"],true,this.physics.add.sprite(843,65,'buildButton'),["null"]);
+    let tree = new Worksite("tree",9,this.physics.add.sprite(1320,175,"carbon"),this.physics.add.sprite(1353,163,"addButton"),this.physics.add.sprite(1112,475,'lumberUI'),this.physics.add.sprite(1425,290,'xbutton'),this.add.text(1154,387,"0",{fontFamily: '"Roboto Condensed"'}),[795,450],1/3,[4,"magic"],true,this.physics.add.sprite(1320,175,'buildButton'),["null"]);
+    let church = new Worksite("church",10,this.physics.add.sprite(550,650,"carbon"),this.physics.add.sprite(585,637,"addButton"),this.physics.add.sprite(1112,475,'lumberUI'),this.physics.add.sprite(1425,290,'xbutton'),this.add.text(1154,387,"0",{fontFamily: '"Roboto Condensed"'}),[795,450],1/3,[1,"faith"],false,this.physics.add.sprite(550,650,'buildButton'),[150,"wood"]);
     farm.init()
     mine.init()
     trader.init()
@@ -427,7 +496,7 @@ class Stage1 extends Phaser.Scene {
     let kainaVepren = new Townmember("Kaina Vepren", 22, "I am happy",[],[],[63,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"kainaPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[0,74])
     let jarackRhysling = new Townmember("Jarack Rhysling", 74, "I am happy",[],["church","monk","tree","lumber","mine"],[126,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"jarackPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[63,74])
     let verdaanisPadra = new Townmember("Verdaanis Padra", 52, "I am happy",[],["church","monk","tree"],[189,74],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"verdaanisPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[126,74])
-    let alvorRiverwood = new Townmember("Alvor Riverwood", 39, "I am happy",[],["smith","smith","smith"],[0,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"alvorPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[189,74])
+    let alvorRiverwood = new Townmember("Alvor Riverwood", 39, "I am happy",[],["smith","smith","smith","lumber","mine"],[0,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"alvorPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[189,74])
     let marstonSinch = new Townmember("Marston Sinch", 45, "I am happy",[],["lumber","mine"],[63,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"marstonPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[252,74])
     let corlissSinch = new Townmember("Corliss Sinch", 43, "I am happy",[],[],[126,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"corlissPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[0,148])
     let maecyCorbray = new Townmember("Maecy Corbray", 33, "I am happy",[],[],[189,148],this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey"),this.physics.add.sprite(0,0,"maecyPopup"),false,[this.physics.add.sprite(50,50,"placeholder"),this.physics.add.sprite(0,0,"placeholderGrey")],[63,148])
@@ -546,10 +615,10 @@ class Stage1 extends Phaser.Scene {
     let gameManager = {
       town: {
         resources: {
-          money: 0,
-          wood: 0,
-          stone: 0,
-          metal: 0,
+          money: 50,
+          wood: 50,
+          stone: 200,
+          metal: 5,
           magic: 0,
           faith: 0,
           food: 0,
@@ -808,6 +877,7 @@ class Stage1 extends Phaser.Scene {
         this.town.resources.ui.oracle.church.setText((gameManager.worksites[9].output[0] * gameManager.worksites[9].multiplier) + " Faith")
       }
     }
+    gameManager.setResourceUI();
 
   }
 

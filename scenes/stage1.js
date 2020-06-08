@@ -7,7 +7,7 @@ class Stage1 extends Phaser.Scene {
     this.load.image('trader','assets/ValescanTrader.png');
     this.load.image('farmhouse','assets/FarmHouse.png');
     this.load.image('farm','assets/farm.png');
-    this.load.image('tree','assets/Tree.png');
+    this.load.image('tree','assets/tree.png');
     this.load.image('addButton','assets/AddButton.png');
     this.load.image('hunterhouse','assets/HuntersHut.png');
     this.load.image('ground','assets/groundSpriteSheet.png');
@@ -269,6 +269,7 @@ class Stage1 extends Phaser.Scene {
         this.thoughts = thoughts
         this.hunger = 0;
         this.tire = 0;
+        this.feedingTag = true
         this.needs = needs
         this.bonuses = bonuses
         this.working = 0
@@ -601,12 +602,14 @@ class Stage1 extends Phaser.Scene {
     //\/\//\/\//\///\\/\/\/\/\/\\\/\/\/\/\/\/\/\\\/\\/\\/\/\//\/\//\\/\//\\/\
     this.ventureButton.on('pointerdown', function() {
       window.game.scene.scenes[0].gameManager.clearUI()
-      window.game.scene.scenes[0].gameManager.calculateMultipliers()
-      window.game.scene.scenes[0].gameManager.calculateGainedResources()
-      window.game.scene.scenes[0].gameManager.feedTown();
-      window.game.scene.scenes[0].gameManager.setResourceUI();
-      window.game.scene.scenes[0].gameManager.resetTire();
-      window.game.scene.scenes[0].gameManager.calculateTire();
+      // window.game.scene.scenes[0].gameManager.calculateMultipliers()
+      // window.game.scene.scenes[0].gameManager.calculateGainedResources()
+      // window.game.scene.scenes[0].gameManager.feedTown();
+      // window.game.scene.scenes[0].gameManager.setResourceUI();
+      // window.game.scene.scenes[0].gameManager.resetTire();
+      // window.game.scene.scenes[0].gameManager.calculateTire();
+      window.game.scene.start('VentureScreen')
+      window.game.scene.sleep('Stage1')
     })
     //\/\//\/\//\///\\/\/\/\/\/\\\/\/\/\/\/\/\/\\\/\\/\\/\/\//\/\//\\/\//\\/\
     // CREATION OF GAME MANAGER                                            /\
